@@ -27,9 +27,11 @@ import (
 	"strings"
 	"sync"
 	"testing"
+	"time"
 
 	"github.com/ghodss/yaml"
 	"github.com/tektoncd/pipeline/pkg/names"
+	"gotest.tools/v3/icmd"
 	corev1 "k8s.io/api/core/v1"
 	"k8s.io/apimachinery/pkg/api/errors"
 	metav1 "k8s.io/apimachinery/pkg/apis/meta/v1"
@@ -50,6 +52,22 @@ func init() {
 	flag.BoolVar(&skipRootUserTests, "skipRootUserTests", false, "Skip tests that require root user")
 }
 
+func Run(cmd ...string) *icmd.Result {
+	return icmd.RunCmd(icmd.Cmd{Command: cmd, Timeout: 10 * time.Minute})
+}
+
+// MustSucceed asserts that the command ran with 0 exit code
+func MustSucceed(t *testing.T, args ...string) *icmd.Result {
+	return Assert(t, icmd.Success, args...)
+}
+
+// Assert runs a command and verifies exit code (0)
+func Assert(t *testing.T, exp icmd.Expected, args ...string) *icmd.Result {
+	res := Run(args...)
+	res.Assert(t, exp)
+	return res
+}
+
 func setup(t *testing.T, fn ...func(*testing.T, *clients, string)) (*clients, string) {
 	t.Helper()
 	namespace := names.SimpleNameGenerator.RestrictLengthWithRandomSuffix("arendelle")
@@ -58,6 +76,7 @@ func setup(t *testing.T, fn ...func(*testing.T, *clients, string)) (*clients, st
 
 	c := newClients(t, knativetest.Flags.Kubeconfig, knativetest.Flags.Cluster, namespace)
 	createNamespace(t, namespace, c.KubeClient)
+	MustSucceed(t, "oc", "adm", "policy", "add-cluster-role-to-user", "system:image-puller", "-z", "pipeline", "-n", namespace)
 	verifyServiceAccountExistence(t, namespace, c.KubeClient)
 
 	for _, f := range fn {

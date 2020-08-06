@@ -27,6 +27,7 @@ require (
 	gomodules.xyz/jsonpatch/v2 v2.1.0
 	google.golang.org/protobuf v1.22.0 // indirect
 	gopkg.in/yaml.v2 v2.3.0 // indirect
+	gotest.tools/v3 v3.0.2
 	k8s.io/api v0.17.6
 	k8s.io/apiextensions-apiserver v0.17.6 // indirect
 	k8s.io/apimachinery v0.17.6
