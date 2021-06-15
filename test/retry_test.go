@@ -34,6 +34,7 @@ import (
 // TestTaskRunRetry tests that retries behave as expected, by creating multiple
 // Pods for the same TaskRun each time it fails, up to the configured max.
 func TestTaskRunRetry(t *testing.T) {
+	t.Skip("Flaky")
 	ctx := context.Background()
 	ctx, cancel := context.WithCancel(ctx)
 	defer cancel()
@@ -53,7 +54,7 @@ func TestTaskRunRetry(t *testing.T) {
 					Name: "retry-me",
 					TaskSpec: &v1beta1.EmbeddedTask{TaskSpec: v1beta1.TaskSpec{
 						Steps: []v1beta1.Step{{
-							Container: corev1.Container{Image: "busybox"},
+							Container: corev1.Container{Image: "mirror.gcr.io/library/busybox"},
 							Script:    "exit 1",
 						}},
 					}},

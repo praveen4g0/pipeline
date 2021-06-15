@@ -34,6 +34,7 @@ import (
 
 // TestDuplicatePodTaskRun creates 10 builds and checks that each of them has only one build pod.
 func TestDuplicatePodTaskRun(t *testing.T) {
+	t.Skip("Too much memory used on OpenShift")
 	t.Parallel()
 
 	ctx, cancel := context.WithCancel(context.Background())
@@ -54,7 +55,7 @@ func TestDuplicatePodTaskRun(t *testing.T) {
 			Spec: v1beta1.TaskRunSpec{
 				TaskSpec: &v1beta1.TaskSpec{
 					Steps: []v1beta1.Step{{Container: corev1.Container{
-						Image:   "busybox",
+						Image:   "mirror.gcr.io/library/busybox",
 						Command: []string{"/bin/echo"},
 						Args:    []string{"simple"},
 					}}},
